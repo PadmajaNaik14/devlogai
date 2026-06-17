@@ -1,0 +1,28 @@
+# Environment files
+.env
+.env.local
+.env.*
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+.next/
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# ChromaDB
+backend/chroma_db/
+
+backend/.env
+backend/venv/
+backend/chroma_db/
