@@ -75,8 +75,8 @@ def login_user(
         }
 
     token = create_access_token(
-        db_user.id
-    )
+    {"user_id": db_user.id}
+)
 
     return {
         "access_token": token,
