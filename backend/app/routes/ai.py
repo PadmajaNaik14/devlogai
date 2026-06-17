@@ -38,6 +38,8 @@ def optimize(
         documents = context["documents"][0]
 
     rag_context = "\n".join(documents)
+    print("RAG CONTEXT:")
+    print(rag_context)
 
     optimized = optimize_journal(
         request.content,
