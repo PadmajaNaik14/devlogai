@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { registerUser } from "@/services/authService";
 
 export default function RegisterPage() {
+  const router = useRouter();
 
   const [name,setName] = useState("");
   const [email,setEmail] = useState("");
@@ -19,7 +21,9 @@ export default function RegisterPage() {
         password
       });
 
-      alert(result.message);
+      alert("Registration successful! Please login.");
+
+      router.push("/login");
 
     } catch(error) {
 
