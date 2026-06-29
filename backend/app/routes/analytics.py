@@ -5,10 +5,14 @@ from sqlalchemy.orm import Session
 from app.database.dependencies import get_db
 from app.models.user import User
 from app.models.journal import Journal
+from app.models.login_activity import LoginActivity
 
 from datetime import datetime
 from collections import defaultdict
 from datetime import timedelta
+from app.middleware.auth_middleware import (
+    get_current_user
+)
 router = APIRouter()
 
 @router.get("/")
@@ -22,12 +26,18 @@ def analytics_home():
 def get_month_journals(
     month:int,
     year:int,
+    current_user=Depends(get_current_user),
     db:Session=Depends(get_db)
 ):
 
-    journals = db.query(
-        Journal
-    ).all()
+    journals = (
+    db.query(Journal)
+    .filter(
+        Journal.user_id ==
+        current_user["user_id"]
+    )
+    .all()
+)
 
     result = []
 
@@ -47,12 +57,18 @@ def get_month_journals(
 def calendar_view(
     month:int,
     year:int,
+    current_user=Depends(get_current_user),
     db:Session=Depends(get_db)
 ):
 
-    journals = db.query(
-        Journal
-    ).all()
+    journals = (
+    db.query(Journal)
+    .filter(
+        Journal.user_id ==
+        current_user["user_id"]
+    )
+    .all()
+)
 
     days = []
 
@@ -74,12 +90,18 @@ def calendar_view(
 
 @router.get("/total")
 def total_journals(
+    current_user=Depends(get_current_user),
     db:Session=Depends(get_db)
 ):
 
-    count = db.query(
-        Journal
-    ).count()
+    count = (
+    db.query(Journal)
+    .filter(
+        Journal.user_id ==
+        current_user["user_id"]
+    )
+    .count()
+)
 
     return {
         "total_journals":count
@@ -87,44 +109,80 @@ def total_journals(
 
 @router.get("/monthly-count")
 def monthly_count(
-    db:Session=Depends(get_db)
-):
-
-    journals = db.query(
-        Journal
-    ).all()
-
-    counts = defaultdict(int)
-
-    for journal in journals:
-
-        key = (
-            f"{journal.created_at.year}-"
-            f"{journal.created_at.month}"
-        )
-
-        counts[key] += 1
-
-    return [
-    {
-        "month": key,
-        "journals": value
-    }
-    for key, value in counts.items()
-]
-
-@router.get("/streak")
-def current_streak(
-    db:Session=Depends(get_db)
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
 
     journals = (
         db.query(Journal)
-        .order_by(
-            Journal.created_at.desc()
+        .filter(
+            Journal.user_id ==
+            current_user["user_id"]
         )
         .all()
     )
+
+    months = {
+        "Jan": 0,
+        "Feb": 0,
+        "Mar": 0,
+        "Apr": 0,
+        "May": 0,
+        "Jun": 0,
+        "Jul": 0,
+        "Aug": 0,
+        "Sep": 0,
+        "Oct": 0,
+        "Nov": 0,
+        "Dec": 0
+    }
+
+    month_names = {
+        1: "Jan",
+        2: "Feb",
+        3: "Mar",
+        4: "Apr",
+        5: "May",
+        6: "Jun",
+        7: "Jul",
+        8: "Aug",
+        9: "Sep",
+        10: "Oct",
+        11: "Nov",
+        12: "Dec"
+    }
+
+    for journal in journals:
+
+        month_name = month_names[
+            journal.created_at.month
+        ]
+
+        months[month_name] += 1
+
+    return [
+        {
+            "month": key,
+            "journals": value
+        }
+        for key, value
+        in months.items()
+    ]
+
+@router.get("/streak")
+def current_streak(
+    current_user=Depends(get_current_user),
+    db:Session=Depends(get_db)
+):
+
+    journals = (
+    db.query(Journal)
+    .filter(
+        Journal.user_id ==
+        current_user["user_id"]
+    )
+    .all()
+)
 
     if not journals:
         return {
@@ -155,12 +213,18 @@ def current_streak(
 
 @router.get("/longest-streak")
 def longest_streak(
+    current_user=Depends(get_current_user),
     db:Session=Depends(get_db)
 ):
 
-    journals = db.query(
-        Journal
-    ).all()
+    journals = (
+    db.query(Journal)
+    .filter(
+        Journal.user_id ==
+        current_user["user_id"]
+    )
+    .all()
+)
 
     dates = sorted(
         list(
@@ -204,12 +268,18 @@ def longest_streak(
 
 @router.get("/heatmap")
 def heatmap(
+    current_user=Depends(get_current_user),
     db:Session=Depends(get_db)
 ):
 
-    journals = db.query(
-        Journal
-    ).all()
+    journals = (
+    db.query(Journal)
+    .filter(
+        Journal.user_id ==
+        current_user["user_id"]
+    )
+    .all()
+)
 
     result = {}
 
@@ -227,34 +297,95 @@ def heatmap(
 
     return result
 
-@router.get("/dashboard")
-def dashboard(
+@router.get("/activity-calendar")
+def activity_calendar(
+    current_user=Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
 
-    total = db.query(
-        Journal
-    ).count()
+    journals = (
+        db.query(Journal)
+        .filter(
+            Journal.user_id ==
+            current_user["user_id"]
+        )
+        .all()
+    )
+
+    logins = (
+        db.query(LoginActivity)
+        .filter(
+            LoginActivity.user_id ==
+            current_user["user_id"]
+        )
+        .all()
+    )
+
+    journal_days = list(
+        set(
+            str(
+                journal.created_at.date()
+            )
+            for journal in journals
+        )
+    )
+
+    login_days = list(
+        set(
+            str(
+                login.login_date.date()
+            )
+            for login in logins
+        )
+    )
+
+    return {
+        "journal_days": journal_days,
+        "login_days": login_days
+    }
+
+@router.get("/dashboard")
+def dashboard(
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+
+    total = (
+    db.query(Journal)
+    .filter(
+        Journal.user_id ==
+        current_user["user_id"]
+    )
+    .count()
+)
 
     current = current_streak(
-        db
+    current_user,
+    db
     )["streak"]
 
     longest = longest_streak(
-        db
+    current_user,
+    db
     )["longest_streak"]
-    latest_user = (
+    
+    user = (
     db.query(User)
-    .order_by(User.id.desc())
-    .first()
+    .filter(
+        User.id ==
+        current_user["user_id"]
     )
+    .first()
+)
 
     ai_count = 0
 
-    if latest_user:
+    ai_count = 0
+
+    if user:
         ai_count = (
-         latest_user.ai_optimizations
-        )
+            user.ai_optimizations
+    )
 
     return {
         "total_journals": total,

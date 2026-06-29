@@ -2,21 +2,19 @@
 
 import { useState } from "react";
 import { createJournal } from "@/services/journalService";
-import { optimizeJournal } from "@/services/aiService";
 import toast from "react-hot-toast";
 
 type JournalEditorProps = {
-  setAiOutput: (output: string) => void;
-  refreshStats: () => void;
+  refreshStats?: () => void;
 };
 
 export default function JournalEditor({
-  setAiOutput,
   refreshStats,
 }: JournalEditorProps) {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const wordCount =
     content.trim() === ""
@@ -24,83 +22,164 @@ export default function JournalEditor({
       : content.trim().split(/\s+/).length;
 
   const saveJournal = async () => {
+
+    if (!title.trim() || !content.trim()) {
+
+      toast.error(
+        "Please enter a title and journal content."
+      );
+
+      return;
+
+    }
+
     try {
+
+      setSaving(true);
+
       await createJournal({
         title,
         content,
       });
 
-      toast.success("Journal Saved");
-      refreshStats();
+      toast.success("Journal Saved!");
+
+      refreshStats?.();
 
       setTitle("");
       setContent("");
 
-    } catch {
-      toast.error("Failed To Save");
     }
-  };
 
-  const handleOptimize = async () => {
-    try {
-
-      const result = await optimizeJournal(
-        content
-      );
-
-      
-
-      setAiOutput(
-        result.optimized
-      );
-      refreshStats();
-
-      toast.success("Journal Optimized");
-
-    } catch(error: any) {
-      console.log(error);
+    catch {
 
       toast.error(
-        "AI Optimization Failed"
+        "Failed To Save"
       );
+
     }
+
+    finally {
+
+      setSaving(false);
+
+    }
+
   };
 
   return (
-    <div className="h-full flex flex-col">
 
-      <input
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Journal Title"
-        className="border p-3 mb-4"
-      />
+    <div className="flex flex-col h-full justify-between">
 
-      <textarea
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        placeholder="Write today's journal..."
-        className="flex-1 border p-3"
-      />
+      <div>
 
-      <p className="mt-2 text-gray-500">
-        Words: {wordCount}
-      </p>
+        <input
+          value={title}
+          onChange={(e) =>
+            setTitle(
+              e.target.value
+            )
+          }
+          placeholder="Journal Title"
+          className="
+          w-full
+          rounded-xl
+          border
+          border-gray-300
+          p-4
+          text-lg
+          text-black
+          placeholder-gray-400
+          focus:outline-none
+          focus:ring-2
+          focus:ring-green-500
+          mb-5
+          "
+        />
 
-      <button
-        onClick={saveJournal}
-        className="mt-4 bg-black text-white p-3 rounded"
-      >
-        Save Journal
-      </button>
+        <textarea
+          value={content}
+          onChange={(e) =>
+            setContent(
+              e.target.value
+            )
+          }
+          placeholder="Write today's journal..."
+          className="
+          w-full
+          h-40
+          rounded-xl
+          border
+          border-gray-300
+          p-4
+          text-black
+          placeholder-gray-400
+          resize-none
+          focus:outline-none
+          focus:ring-2
+          focus:ring-green-500
+          "
+        />
 
-      <button
-        className="mt-2 border p-3 rounded w-full"
-        onClick={handleOptimize}
-      >
-        Optimize Journal
-      </button>
+      </div>
+
+      <div className="mt-5">
+
+        <div className="flex justify-between items-center">
+
+          <p className="text-gray-500">
+
+            {wordCount} words
+
+          </p>
+
+          <button
+
+            onClick={saveJournal}
+
+            disabled={saving}
+
+            className="
+            bg-green-600
+            hover:bg-green-700
+            active:scale-95
+            active:shadow-inner
+            transition-all
+            duration-150
+            disabled:bg-gray-400
+            disabled:cursor-not-allowed
+            text-white
+            px-8
+            py-3
+            rounded-xl
+            font-semibold
+            shadow-md
+            "
+
+          >
+
+            {
+
+              saving
+
+                ?
+
+                "Saving..."
+
+                :
+
+                "Save Journal"
+
+            }
+
+          </button>
+
+        </div>
+
+      </div>
 
     </div>
+
   );
+
 }

@@ -29,3 +29,23 @@ export const getCalendarDays = async (
 
   return response.data;
 };
+
+export const getHeatmapData = async () => {
+
+  const response = await api.get(
+    "/analytics/heatmap"
+  );
+
+  return response.data;
+
+};
+
+export const getActivityCalendar = async () => {
+
+  const response = await api.get(
+    "/analytics/activity-calendar"
+  );
+
+  return response.data;
+
+};

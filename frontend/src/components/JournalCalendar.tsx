@@ -1,71 +1,202 @@
 "use client";
+
 import { useEffect, useState } from "react";
 
 import {
-  getCalendarDays
+  getActivityCalendar
 } from "@/services/analyticsService";
 
 import Calendar from "react-calendar";
+
 import "react-calendar/dist/Calendar.css";
 
 export default function JournalCalendar() {
-  const [days, setDays] =
-  useState<number[]>([]);
+
+  const [journalDays, setJournalDays] =
+    useState<string[]>([]);
+
+  const [loginDays, setLoginDays] =
+    useState<string[]>([]);
+
   useEffect(() => {
 
-  loadDays();
+    loadActivity();
 
-}, []);
-const loadDays = async () => {
+  }, []);
 
-  const today = new Date();
+  const loadActivity = async () => {
 
-  const data =
-    await getCalendarDays(
-      today.getMonth() + 1,
-      today.getFullYear()
+    const data =
+      await getActivityCalendar();
+
+    setJournalDays(
+      data.journal_days
     );
-    console.log(data);
 
-  setDays(
-    data.days
-  );
-};
+    setLoginDays(
+      data.login_days
+    );
+
+  };
 
   return (
 
-    <div className="border rounded p-4">
+    <div
+  className="
+  bg-white
+  rounded-2xl
+  shadow-lg
+  p-8
+  w-full
+  "
+>
 
-      <h2 className="font-bold mb-4">
+      <h4
+  className="
+  text-3xl
+  font-bold
+  text-[#89023E]
+  mb-8
+  "
+>
+  Activity Calendar
+</h4>
 
-        Journal Calendar
+      <div className="w-full">
 
-      </h2>
+  <Calendar
 
-      <Calendar
-  tileClassName={({ date }) => {
+        tileContent={({ date }) => {
 
-    if (
-      days.includes(
-        date.getDate()
-      )
-    ) {
+          const formatted =
+  `${date.getFullYear()}-${
+    String(date.getMonth() + 1).padStart(2, "0")
+  }-${
+    String(date.getDate()).padStart(2, "0")
+  }`;
 
-      return "journal-day";
-    }
+          const hasJournal =
+            journalDays.includes(
+              formatted
+            );
 
-    return "";
-  }}
-/>
-<style jsx global>{`
-  .journal-day {
-    background: #22c55e !important;
-    color: white !important;
-    border-radius: 9999px !important;
-  }
-`}</style>
+          const hasLogin =
+            loginDays.includes(
+              formatted
+            );
 
-    </div>
+          return (
+
+            <div
+              className="
+absolute
+bottom-2
+left-0
+right-0
+flex
+justify-center
+gap-1
+"
+            >
+
+              {
+
+                hasJournal && (
+
+                  <div
+                    className="
+                    w-2
+                    h-2
+                    rounded-full
+                    bg-green-500
+                    "
+                  />
+
+                )
+
+              }
+
+              {
+
+                hasLogin && (
+
+                  <div
+                    className="
+                    w-2
+                    h-2
+                    rounded-full
+                    bg-yellow-400
+                    "
+                  />
+
+                )
+
+              }
+
+            </div>
+
+          );
+
+        }}
+
+      /></div>
+      
+
+      {/* Legend */}
+
+      <div
+  className="
+  flex
+  justify-center
+  gap-10
+  mt-8
+  text-sm
+  "
+>
+
+  <div
+    className="
+    flex
+    items-center
+    gap-2
+    "
+  >
+    <div
+      className="
+      w-3
+      h-3
+      rounded-full
+      bg-green-500
+      "
+    />
+    <span>
+      Journal Created
+    </span>
+  </div>
+
+  <div
+    className="
+    flex
+    items-center
+    gap-2
+    "
+  >
+    <div
+      className="
+      w-3
+      h-3
+      rounded-full
+      bg-yellow-400
+      "
+    />
+    <span>
+      Logged In
+    </span>
+  </div>
+
+</div>
+</div>
+    
 
   );
 }

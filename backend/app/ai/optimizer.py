@@ -26,6 +26,9 @@ Convert this into:
 2. Key Achievements
 3. LinkedIn Ready Post
 """
+    print("========== GEMINI PROMPT ==========")
+    print(prompt)
+    print("===================================")
 
     response = model.generate_content(
         prompt

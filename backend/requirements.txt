@@ -17,3 +17,5 @@ google-generativeai
 chromadb
 
 pydantic==2.13.4
+
+slowapi==0.1.9

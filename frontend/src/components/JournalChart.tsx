@@ -29,11 +29,25 @@ const loadData = async () => {
   setData(result);
 };
   return (
-    <div className="border rounded p-4">
+    <div
+  className="
+  bg-white
+  rounded-xl
+  shadow-md
+  p-6
+  "
+>
 
-      <h2 className="font-bold mb-4">
-        Journal Activity
-      </h2>
+      <h2
+  className="
+  text-2xl
+  font-bold
+  text-black
+  mb-6
+  "
+>
+  Monthly Journal Activity
+</h2>
 
       <ResponsiveContainer
         width="100%"

@@ -1,4 +1,3 @@
-
 type AnalyticsCardsProps = {
   stats: {
     total_journals: number;
@@ -7,42 +6,78 @@ type AnalyticsCardsProps = {
     ai_optimizations: number;
   };
 };
+
 export default function AnalyticsCards({
   stats,
 }: AnalyticsCardsProps) {
 
+  const cards = [
+    {
+      title: "Total Journals",
+      value: stats.total_journals
+    },
+    {
+      title: "Current Streak",
+      value: stats.current_streak
+    },
+    {
+      title: "Longest Streak",
+      value: stats.longest_streak
+    },
+    {
+      title: "AI Optimizations",
+      value: stats.ai_optimizations
+    }
+  ];
 
   return (
 
     <div className="grid grid-cols-4 gap-4">
 
-      <div className="border p-4 rounded">
-        <h2>Total Journals</h2>
-        <p className="text-2xl font-bold">
-  {stats.total_journals}
-</p>
-      </div>
+      {
 
-      <div className="border p-4 rounded">
-        <h2>Current Streak</h2>
-        <p className="text-2xl font-bold">
-          {stats.current_streak}
-        </p>
-      </div>
+        cards.map(
+          (card) => (
 
-      <div className="border p-4 rounded">
-        <h2>Longest Streak</h2>
-        <p className="text-2xl font-bold">
-          {stats.longest_streak}
-        </p>
-      </div>
+            <div
+              key={card.title}
+              className="
+              bg-white
+              rounded-xl
+              shadow-md
+              border-t-8
+              border-green-300
+              p-6
+              "
+            >
 
-      <div className="border p-4 rounded">
-        <h2>AI Optimizations</h2>
-        <p className="text-2xl font-bold">
-          {stats.ai_optimizations}
-        </p>
-      </div>
+              <h2
+                className="
+                text-xl
+                text-black
+                mb-3
+                "
+              >
+                {card.title}
+              </h2>
+
+              <p
+                className="
+                text-5xl
+                font-bold
+                text-black
+                text-center
+                "
+              >
+                {card.value}
+              </p>
+
+            </div>
+
+          )
+        )
+
+      }
 
     </div>
 

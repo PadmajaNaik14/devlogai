@@ -1,6 +1,42 @@
 "use client";
+import { useEffect } from "react";
+import { useState } from "react";
+
+import {
+  getCurrentUser
+} from "@/services/userService";
+
+import Link from "next/link";
 
 export default function Sidebar() {
+  const [userName, setUserName] =
+  useState("Loading...");
+  useEffect(() => {
+
+  const loadUser =
+    async () => {
+
+      try {
+
+        const user =
+          await getCurrentUser();
+
+        setUserName(
+          user.name
+        );
+
+      } catch {
+
+        setUserName(
+          "User"
+        );
+
+      }
+    };
+
+  loadUser();
+
+}, []);
 
   const logout = () => {
 
@@ -12,7 +48,7 @@ export default function Sidebar() {
 
   return (
 
-    <div className="h-full flex flex-col justify-between p-4">
+    <div className="h-full flex flex-col p-4">
 
       <div>
 
@@ -21,26 +57,29 @@ export default function Sidebar() {
         </h2>
 
         <ul className="space-y-2">
-
+          <Link href="/dashboard">
           <li className="p-3 rounded hover:bg-gray-100 cursor-pointer">
             Dashboard
           </li>
+          </Link>
 
-          <li className="p-3 rounded hover:bg-gray-100 cursor-pointer">
-            Journals
-          </li>
+          <Link href="/journals">
+  <li className="p-3 rounded hover:bg-gray-100 cursor-pointer">
+    Journals
+  </li>
+</Link>
 
-          <li className="p-3 rounded hover:bg-gray-100 cursor-pointer">
-            Calendar
-          </li>
-
+          <Link href="/calendar">
+  <li className="p-3 rounded hover:bg-gray-100 cursor-pointer">
+    Calendar
+  </li>
+</Link>
+          <Link href="/analytics">
           <li className="p-3 rounded hover:bg-gray-100 cursor-pointer">
             Analytics
           </li>
+          </Link>
 
-          <li className="p-3 rounded hover:bg-gray-100 cursor-pointer">
-            AI Studio
-          </li>
 
         </ul>
 
@@ -48,9 +87,13 @@ export default function Sidebar() {
 
       <div className="border-t pt-4">
 
-        <p className="font-semibold">
-          User
-        </p>
+      <p className="font-semibold">
+  {userName}
+</p>
+
+<p className="text-sm text-gray-500">
+  Logged In
+</p>
 
         <button
           onClick={logout}

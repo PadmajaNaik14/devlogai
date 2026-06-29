@@ -25,11 +25,13 @@ def get_current_user(
         token
     )
 
+
     if not payload:
 
         raise HTTPException(
             status_code=401,
             detail="Invalid token"
         )
+    print(payload)
 
     return payload

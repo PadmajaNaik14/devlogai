@@ -1,19 +1,23 @@
 from jose import jwt
+from jose import JWTError
+
 from datetime import datetime
 from datetime import timedelta
+
 from dotenv import load_dotenv
+
 import os
-from jose import JWTError
 
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 
+
 def create_access_token(user_id):
 
     payload = {
-        "sub": str(user_id),
+        "user_id": user_id,
         "exp": datetime.utcnow() + timedelta(days=1)
     }
 

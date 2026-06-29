@@ -1,35 +1,30 @@
-import Link from "next/link";
+import LandingNavbar from "@/components/landing/LandingNavbar";
+import HeroSection from "@/components/landing/HeroSection";
+import FeaturesSection from "@/components/landing/FeaturesSection";
+import ShowcaseSection from "@/components/landing/ShowcaseSection";
+import TechStackSection from "@/components/landing/TechStackSection";
+import ContactSection from "@/components/landing/ContactSection";
 
 export default function Home() {
+
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center">
 
-      <h1 className="text-5xl font-bold">
-        DevLog AI
-      </h1>
+    <main>
 
-      <p className="mt-4 text-lg">
-        AI Powered Developer Journal
-      </p>
+      <LandingNavbar />
 
-      <div className="mt-8 flex gap-4">
+      <HeroSection />
 
-        <Link
-          href="/login"
-          className="bg-black text-white px-6 py-3 rounded"
-        >
-          Login
-        </Link>
+      <FeaturesSection />
 
-        <Link
-          href="/register"
-          className="border px-6 py-3 rounded"
-        >
-          Register
-        </Link>
+      <ShowcaseSection />
 
-      </div>
+      <TechStackSection />
+
+      <ContactSection />
 
     </main>
+
   );
+
 }
